@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Products</title>
+</head>
+<body>
+    <h1>Lista de Productos en Tiempo Real</h1>
+    <ul id="product-list">
+        {{#each productos}}
+            <li>{{this}}</li>
+        {{/each}}
+    </ul>
+
+    <form id="product-form">
+        <input type="text" id="product-name" placeholder="Nombre del producto">
+        <button type="submit">Agregar Producto</button>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('updateProducts', (productos) => {
+        const productList = document.getElementById('product-list');
+        productList.innerHTML = '';
+
+        productos.forEach(producto => {
+            const li = document.createElement('li');
+            li.textContent = producto;
+            productList.appendChild(li);
+        });
+        });
+
+        document.getElementById('product-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const productName = document.getElementById('product-name').value.trim();
+        if (productName !== '') {
+            socket.emit('addProduct', productName); // Enviar nombre del producto al servidor
+            document.getElementById('product-name').value = '';
+        }
+    });
+    </script>
+</body>
+</html>
